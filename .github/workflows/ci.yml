@@ -1,0 +1,30 @@
+name: Pruebas y entrega
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -v
+  delivery:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          python -m compileall -q tareas.py
+          mkdir -p paquete
+          cp tareas.py paquete/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquete-lab
+          path: paquete/
