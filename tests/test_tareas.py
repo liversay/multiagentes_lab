@@ -22,11 +22,15 @@ class TestTareas(unittest.TestCase):
         self.assertEqual(tareas, [])
     def test_filtrar_por_prioridad(self):
         tareas = []
-        agregar(tareas, "Leer", "alta")
-        agregar(tareas, "Correr")
-        agregar(tareas, "Dormir", "baja")
-        filtradas = filtrar_por_prioridad(tareas, "alta")
-        self.assertEqual([t["titulo"] for t in filtradas], ["Leer"])
+        for prioridad in ("alta", "media", "baja"):
+            agregar(tareas, prioridad + " 1", prioridad)
+            agregar(tareas, prioridad + " 2", prioridad)
+        for prioridad in ("alta", "media", "baja"):
+            with self.subTest(prioridad=prioridad):
+                filtradas = filtrar_por_prioridad(tareas, prioridad)
+                self.assertEqual([t["titulo"] for t in filtradas],
+                                 [prioridad + " 1", prioridad + " 2"])
+        self.assertEqual(pendientes(tareas), tareas)
     def test_filtrar_prioridad_invalida(self):
         with self.assertRaises(ValueError):
             filtrar_por_prioridad([], "urgente")
