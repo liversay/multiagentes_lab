@@ -84,6 +84,24 @@ async def revisar():
     print("Exit code pruebas:", pruebas.returncode)
     print("Revise evidencias/03_revision.md")
 
+async def documentar():
+    plan = (EVID / "01_plan.md").read_text(encoding="utf-8")
+    codigo = Path("tareas.py").read_text(encoding="utf-8")
+    sugerencia = consultar(
+        "documentador",
+        "Eres documentador. Sugiere un README breve en Markdown. "
+        "Describe solo lo que existe en el CÓDIGO APROBADO. "
+        "Si el PLAN y el código difieren, manda el código. "
+        "No inventes funciones, comandos ni dependencias.",
+        "PLAN:\n" + plan + "\nCÓDIGO APROBADO:\n" + codigo,
+    )
+    (EVID / "04_readme_sugerido.md").write_text(
+        sugerencia, encoding="utf-8"
+    )
+    print("Sugerencia en evidencias/04_readme_sugerido.md")
+    print("No se creó ni se modificó README.md.")
+
 if __name__ == "__main__":
-    modo = input("Modo (proponer/revisar): ").strip()
-    asyncio.run(revisar() if modo == "revisar" else proponer())
+    modo = input("Modo (proponer/revisar/documentar): ").strip()
+    modos = {"revisar": revisar, "documentar": documentar}
+    asyncio.run(modos.get(modo, proponer)())
